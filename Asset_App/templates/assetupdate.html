@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Asset Registration Form</title>
+</head>
+<body>
+<h3>Asset Type Update Form </h3>
+<div>
+<form action="create " method="POST" >
+    {% csrf_token %}
+
+
+
+    <br>
+    <br>
+    <label for="cars">Choose Record ID to be Update :</label>
+     <select name="assettype" id="cars">
+       {% for element in result %}
+      <option name="asset" value={{ element.id}}>{{ element.id }}</option>
+
+       {% endfor %}
+
+    <input class="button" type="submit" value="Update ">
+</form>
+</div>
+
+
+</body>
+</html>

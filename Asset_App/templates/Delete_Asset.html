@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Record</title>
+</head>
+<body>
+<form action="record" method="post">
+    {% csrf_token %}
+  <label for="cars">Choose Record ID to be delete :</label>
+  <select name="asset" id="cars">
+       {% for element in result %}
+      <option name="asset" value={{ element.id }}>{{ element.id }}</option>
+
+       {% endfor %}
+
+  </select>
+  <br><br>
+
+  <button onclick="confirmation()">Delete</button>
+
+  <script>
+    function confirmation(){
+      var result = confirm("Are you sure you want to delete record?");
+      if(result){
+        console.log("Deleted")
+      }
+    }
+  </script>
+</form>
+</body>
+</html>

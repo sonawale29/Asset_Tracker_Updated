@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Asset Registration Form</title>
+</head>
+<body>
+<h3>Asset Type Registration Form </h3>
+<form action="create" method="POST" >
+    {% csrf_token %}
+         {{form.as_p}}
+    <input class="button" type="submit" value="Add ">
+      </form>
+
+</body>
+</html>
