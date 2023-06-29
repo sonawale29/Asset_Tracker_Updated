@@ -1,11 +1,11 @@
-import random
+import os
 
 from django.core.paginator import Paginator
 from django.shortcuts import render, HttpResponse, redirect
 from matplotlib import pyplot as plt
 from django.contrib.auth.decorators import login_required
 
-from forms import AssetModelRegistration
+
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from Asset_App.models import AssetModel, AssetTypeModel
@@ -17,7 +17,7 @@ import csv
 
 
 # Create your views here.
-@login_required(login_url="")
+@login_required(login_url='admin_login')
 def AssetEntry(request):
     form_fields = AssetModelRegistration
     context = {"form": form_fields}
@@ -77,7 +77,7 @@ def asset_data(request):
 
     return render(request, "Asset_Data_Table.html", context={"result": result})
 
-
+@login_required(login_url='admin_login')
 def admin_panel(request):
     context = {"context": "Hello"}
     uname = request.POST["uname"]
@@ -85,7 +85,7 @@ def admin_panel(request):
 
     user_authenticate = authenticate(username=uname, password=pass_)
     if user_authenticate is not None:
-        return render(request, "adminpanel.html", context)
+        return render(request, "simple.html", context)
 
     return redirect("admin_login")
 
@@ -104,17 +104,16 @@ def delete_asset(request):
 @login_required(login_url='admin_login')
 def deleteassettype(request, *args, **kwargs):
     find = request._post
-    result = AssetModel.objects.filter(id=find.get("assettype"))
+    result = AssetTypeModel.objects.filter(id=find.get("assettype"))
     result.delete()
     return redirect("assettypedata")
 
-
+@login_required(login_url='admin_login')
 def deleteasset(request, *args, **kwargs):
-    breakpoint()
     find = request._post
     result = AssetModel.objects.get(pk=find.get("asset"))
     result.delete()
-    return redirect("assettypedata")
+    return redirect("assetdata")
 
 @login_required(login_url='admin_login')
 def update(request, *args, **kwargs):
@@ -124,20 +123,13 @@ def update(request, *args, **kwargs):
 
 @login_required(login_url='admin_login')
 def updaterecord(request):
-    breakpoint()
-
     data = request._post
     find = data.get("assettype")
-    breakpoint()
-    # result = AssetTypeModel.objects.get(pk=find)
-    # result.Asset_Type = data.get("Asset_Type")
-    # result.Asset_Description = data.get("Asset_Description")
-    # result.save()
 
     band = AssetTypeModel.objects.get(pk=find)
     form = AssetTpeRegistration(
         instance=band
-    )  # prepopulate the form with an existing band
+    )
     return render(request, "Asset_type_update.html", {"form": form, "id": find})
 
 @login_required(login_url='admin_login')
@@ -230,6 +222,11 @@ def export_to_csv_assettypemodel(request):
 
 @login_required(login_url='admin_login')
 def piechart(request):
+    breakpoint()
+    path = '/home/neosoft/PycharmProjects/Asset_Tracker/media/sale_purchase_peichart.png'
+
+    if os.path.isfile(path):
+        os.remove(path)
 
     # Pie chart, where the slices will be ordered and plotted counter-clockwise:
     result1 = AssetTypeModel.objects.all()
@@ -239,7 +236,7 @@ def piechart(request):
     sizes = []
 
     for ele in result1:
-        count = AssetModel.objects.all().filter(AssetType_id=ele.id).count()
+        count = AssetModel.objects.all().filter(AssetType=ele.id).count()
         sizes.append(count)
     # sizes = [random.randint(10,30), random.randint(30,50)]
     explode = (0,) * len(labels)  # only "explode" the 2nd slice (i.e. 'Hogs')
@@ -259,6 +256,7 @@ def piechart(request):
 
 @login_required(login_url='admin_login')
 def barchart(request):
+    breakpoint()
     Active = AssetModel.objects.all().filter(Active_Status=True).count()
     Inactive = AssetModel.objects.all().filter(Active_Status=False).count()
     objects = ["Active", "Inactive"]
