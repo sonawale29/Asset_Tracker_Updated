@@ -3,8 +3,13 @@
 import datetime
 from django.db import migrations, models
 import django.db.models.deletion
+from django.db import migrations, connection
 
-
+def alter_table(apps, schema_editor):
+    query ="ALTER TABLE AssetTypeModel ADD UNIQUE (Asset_Type);"
+    cursor = connection.cursor()
+    cursor.execute(query)
+    cursor.close()
 class Migration(migrations.Migration):
     initial = True
 

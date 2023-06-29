@@ -1,7 +1,8 @@
 import os
-
+from django.contrib import messages
 from django.core.paginator import Paginator
-from django.shortcuts import render, HttpResponse, redirect
+from django.db import IntegrityError
+from django.shortcuts import render, HttpResponse, redirect,render_to_response
 from matplotlib import pyplot as plt
 from django.contrib.auth.decorators import login_required
 
@@ -9,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from Asset_App.models import AssetModel, AssetTypeModel
+
 from django.views import View
 from django.views.generic.edit import CreateView
 from forms import AssetModelRegistration, AssetTpeRegistration
@@ -54,16 +56,24 @@ def assetentry(request, *args, **kwargs):
 
 @login_required(login_url='admin_login')
 def assettypeentry(request, *args, **kwargs):
-    form_field = AssetTpeRegistration(request.POST)
-    if form_field.is_valid():
-        form_field.save()
-        return redirect("assettypedata")
 
+    if request.method == 'POST':
+        form_field = AssetTpeRegistration(request.POST)
+        if form_field.is_valid():
+            form_field.save()
+            return redirect("assettypedata")
+        else:
+            result = form_field.data.get('Asset_Type')
+            check = AssetTypeModel.objects.get(Asset_Type=result)
+            if check:
+                messages.warning(request, f'{result} Asset Type already exit.')
 
+                return redirect('Assettype')
     else:
-        return render(request, "Asset_type_registraion.html")
-
-
+        form = AssetTpeRegistration()
+    return render(request,"Asset_type_registraion.html",context={
+        'form': form
+    })
 
 @login_required(login_url='admin_login')
 def asset_type_data(request):
@@ -222,11 +232,11 @@ def export_to_csv_assettypemodel(request):
 
 @login_required(login_url='admin_login')
 def piechart(request):
-    breakpoint()
+
     path = '/home/neosoft/PycharmProjects/Asset_Tracker/media/sale_purchase_peichart.png'
 
     if os.path.isfile(path):
-        os.remove(path)
+        os.remove('media/sale_purchase_peichart.png')
 
     # Pie chart, where the slices will be ordered and plotted counter-clockwise:
     result1 = AssetTypeModel.objects.all()
@@ -256,7 +266,12 @@ def piechart(request):
 
 @login_required(login_url='admin_login')
 def barchart(request):
-    breakpoint()
+
+    path = '/home/neosoft/PycharmProjects/Asset_Tracker/media/barchart.png'
+
+    if os.path.isfile(path):
+        os.remove('media/barchart.png')
+
     Active = AssetModel.objects.all().filter(Active_Status=True).count()
     Inactive = AssetModel.objects.all().filter(Active_Status=False).count()
     objects = ["Active", "Inactive"]

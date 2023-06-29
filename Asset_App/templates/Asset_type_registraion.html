@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title>Asset Registration Form</title>
@@ -11,6 +11,15 @@
          {{form.as_p}}
     <input class="button" type="submit" value="Add ">
       </form>
+<div>
+{% for message in messages %}
+  <div class="alert {{ message.tags }} alert-dismissible" role="alert">
+
+    {{ message }}
+  </div>
+{% endfor %}
+
+</div>
 
 </body>
 </html>
